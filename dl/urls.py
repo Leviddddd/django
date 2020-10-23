@@ -8,9 +8,14 @@ def tick():
     print('Tick! The time is: %s' % datetime.now())
 
 
+def tick1():
+    print('第二个')
+
+
 scheduler = BackgroundScheduler()
 scheduler.add_job(tick, 'interval', seconds=30)
-scheduler.start()
+scheduler.add_job(tick1, 'interval', seconds=10)
+# scheduler.start()
 
 urlpatterns = [
     path('', views.login, name='login'),

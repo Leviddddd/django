@@ -64,11 +64,19 @@ def register(request):
     try:
         username = request.POST.get('username', '')
         password = request.POST.get('password', '')
-        user = User.objects.create_user(username=username, password=password)
-        if user:
-            return HttpResponseRedirect('/login')
+        local_user = models.AuthUser.objects.filter().values('username')
+        user_list = []
+        for i in local_user:
+            user_list.append(i['username'])
+        print(user_list)
+        if username in user_list:
+            return render(request, 'tset.html', {'error': '账号已存在，注册失败'})
         else:
-            return render(request, '/register_page', {'error': 'false'})
+            user = User.objects.create_user(username=username, password=password)
+            if user:
+                return HttpResponseRedirect('/login')
+            else:
+                return render(request, '/register_page', {'error': 'false'})
     except Exception as e:
         raise e
 
