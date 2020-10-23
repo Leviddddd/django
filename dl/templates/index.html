@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>开会时间</title>
+
+<h1>开会时间投票</h1>
+
+{% load static %}
+<script type='text/javascript' src="{% static 'js/jquery.min.js' %}"></script>
+<!--<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>-->
+<script type="text/javascript">
+  $.ajaxSetup({
+            data:{csrfmiddlewaretoken:'{{ csrf_token }}'}
+        })
+    var vote_info ={{vote_info | safe}}
+    function force(voteId, userId, voteType){
+      $.post('/vote_action/',
+        {user_id: userId,
+        vote_id: voteId,
+        vote_type: voteType
+        },function(data){
+     alert("Data Loaded: " + data.error);
+   });
+        }
+    function query(){
+      const DOM = document.getElementById('container')
+      let result = ''
+      vote_info.forEach((item)=>{
+        result+='<div><span>'+item.num+'</span><a onclick="force('+item.id+','+item.user_id+',1)">投票</a><span>'+item.force_num+'</span><a onclick="force('+item.id+','+item.user_id+',2)">强制开会</a>'+item.vote_name+'</div>'
+      })
+      DOM.innerHTML = result
+    }
+    $(document).ready(function(){
+        query()
+        $('#container div a').click(function(){
+            $(this).parent().animate({
+                width:'+=50px'
+            },500);
+            $(this).prev().html(parseInt($(this).prev().html())+1);
+            document.getElementById('container').style = 'pointer-events: none';
+        })
+    })
+</script>
+<style type="text/css">
+    *{
+        padding:0;
+        margin:0;
+        font-family:Arial
+    }
+    body{
+        background:#ffffff url('trentanove.gif') repeat right top;
+    }
+    #container{
+        margin-top:20px;
+        color:#1d1a1a;
+    }
+    #container #question{
+        display:block;
+        padding:20px;
+        margin-bottom:20px;
+        padding:10px;
+   
+    }
+    #container div{              
+        background:#dcdada;
+        margin-bottom:15px;
+        padding:10px;
+        color:#1d1a1a;
+        border-left:0px solid #333;
+        width:320px;
+        -webkit-border-radius:0.5em;
+        -moz-border-radius:0 0.5em 0.5em 0;
+        border-radius:0 1.5em 1.5em 0
+    }
+    #container div a{
+        border-radius:0.3em;
+        text-decoration:none;
+        color:#1d1a1a;
+        padding:5px 15px;
+        background:#f38d8d;
+        margin:0 20px;
+    }
+    #container div a:hover{
+        color:#1d1a1a;
+    }
+</style>
+</head>
+<body>
+<h4>注意：你本月只有一次《强制开会》</h4>
+<!--<form method="post" action="">-->
+
+  <div id="container">
+<!--    {% csrf-token % }-->
+<!--      <span id="question"></span>-->
+<!--      {% for info in vote_info %}-->
+<!--      <div><span id="first">{{info.num}}</span><a href="">投票</a><span id="second">{{info.force_num}}</span><a href="">强制开会</a>{{info.vote_name}}</div>-->
+<!--      {% endfor %}-->
+
+  </div>
+  <div>{{ error }}<br>
+    </div>
+<!--</form>-->
+
+</body>
+</html>
