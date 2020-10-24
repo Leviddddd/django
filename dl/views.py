@@ -1,12 +1,12 @@
-import json
+
 import time
 
 from django.contrib import auth
 from django.contrib.auth.models import User
-from django.core import serializers
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-
+from apscheduler.schedulers.blocking import BlockingScheduler
 from dl import models
 # Create your views here.
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
@@ -14,6 +14,7 @@ from datetime import datetime
 from django.utils.datetime_safe import datetime
 from dl.models import Vote
 
+scheduler = BlockingScheduler()
 data = {'status': 3, 'error': '参数错误'}
 success = {'status': 1, 'error': '成功'}
 failure = {'status': 2, 'error': '失败'}
@@ -30,7 +31,7 @@ def login_action(request):
         user = auth.authenticate(username=username, password=password)
         if user:
             auth.login(request, user)
-            response = HttpResponseRedirect('/vote/')
+            response = HttpResponseRedirect('/dl/vote/')
             # request.session['user'] = username
             user_id = models.AuthUser.objects.filter(username=username).values('id')
             if len(user_id):
@@ -42,9 +43,17 @@ def login_action(request):
         else:
             return render(request, 'login.html', {'error': '请输入正确的账号或密码!'})
     else:
-        return render(request, 'login.html', {'error': 'username or password error!!!'})
+        return render(request, 'login.html', {'error': '请求错误'})
 
 
+@login_required
+def logout(requst):
+    auth.logout(requst)
+    response = HttpResponseRedirect('/dl/login/')
+    return response
+
+
+@login_required
 def vote_page(request):
     user_id = request.session.get('user', '')
     vote_info = models.Vote.objects.all().values('id', 'vote_name', 'num', 'force_num')
@@ -60,7 +69,7 @@ def register_page(request):
 
 
 def register(request):
-    HttpResponseRedirect('/register_page')
+    HttpResponseRedirect('/dl/register_page')
     try:
         username = request.POST.get('username', '')
         password = request.POST.get('password', '')
@@ -74,9 +83,9 @@ def register(request):
         else:
             user = User.objects.create_user(username=username, password=password)
             if user:
-                return HttpResponseRedirect('/login')
+                return HttpResponseRedirect('/dl/login')
             else:
-                return render(request, '/register_page', {'error': 'false'})
+                return render(request, '/dl/register_page', {'error': 'false'})
     except Exception as e:
         raise e
 
@@ -93,12 +102,13 @@ def get_time_info(info, time_stramp=None):
 
 
 @csrf_exempt
+@login_required
 def vote_action(request):
     userId = int(request.POST.get('user_id'))
     voteId = int(request.POST.get('vote_id'))
     voteType = int(request.POST.get('vote_type'))
     try:
-        user_vote_record = models.UserVote.objects.filter(vote_id=voteId, user_id=userId, vote_type=voteType).values()
+        user_vote_record = models.UserVote.objects.filter(user_id=userId, vote_type=voteType).values()
         if user_vote_record:
             update_time = str(user_vote_record[0]['update_time']).split('+')[0]
             timeArray = time.strptime(update_time, "%Y-%m-%d %H:%M:%S")
@@ -111,13 +121,9 @@ def vote_action(request):
             month = int(time.localtime().tm_mon)
             # 周投票
             if voteType == 1:
-                if now_week > old_week and now_year == old_year:
-                    models.UserVote.objects.filter(id=user_vote_record[0]['id']).update(update_time=datetime.now())
-                    vote_num = models.Vote.objects.filter(id=voteId).values('num')[0]['num']
-                    models.Vote.objects.filter(id=voteId).update(num=vote_num + 1)
-                    return JsonResponse(success)
-                elif now_year > old_year:
-                    models.UserVote.objects.filter(id=user_vote_record[0]['id']).update(update_time=datetime.now())
+                if now_week > old_week and now_year == old_year or now_year > old_year:
+                    models.UserVote.objects.filter(id=user_vote_record[0]['id']).update(vote_id=voteId,
+                                                                                        update_time=datetime.now())
                     vote_num = models.Vote.objects.filter(id=voteId).values('num')[0]['num']
                     models.Vote.objects.filter(id=voteId).update(num=vote_num + 1)
                     return JsonResponse(success)
@@ -129,7 +135,8 @@ def vote_action(request):
                 if month > old_month and now_year == old_year or now_year > old_year:
                     force_num = models.Vote.objects.filter(id=voteId).values('force_num')[0]['force_num']
                     models.Vote.objects.filter(id=voteId).update(force_num=force_num + 1)
-                    models.UserVote.objects.filter(id=user_vote_record[0]['id']).update(update_time=datetime.now())
+                    models.UserVote.objects.filter(id=user_vote_record[0]['id']).update(vote_id=voteId,
+                                                                                        update_time=datetime.now())
                     return JsonResponse(success)
                 else:
                     return JsonResponse(failure)
