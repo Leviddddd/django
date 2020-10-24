@@ -59,3 +59,4 @@ class UserVote(models.Model):
     class Meta:
         managed = False
         db_table = 'user_vote'
+        unique_together = ('user_id', 'vote_type')

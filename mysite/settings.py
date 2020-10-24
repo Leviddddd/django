@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'dl'
+    'dl',
+    'bootstrap3',
 ]
 
 MIDDLEWARE = [
@@ -128,3 +129,5 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (BASE_DIR, 'dl/templates/')
+
+DEFAULT_CONTENT_TYPE = 'text/html'

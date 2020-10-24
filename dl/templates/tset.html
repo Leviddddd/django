@@ -4,14 +4,17 @@
 <html>
     <head>
         <meta charset="UTF-8">
+        {% load bootstrap3 %}
+        {% bootstrap_css %}
+        {% bootstrap_javascript %}
         <title></title>
         <style type="text/css">
             form
             {
                 width:100%;
-                height:700px;
+                height:300px;
                  margin-top: 0px;
-                background:#008B8B;
+<!--                background:#008B8B;-->
             }
             div
             {
@@ -34,10 +37,10 @@
     </head>
     <body>
     <div>
-        <form method="post" action="/register/">
-        <h3>
+        <form method="post" action="/dl/register/">
+        <h2>
             注册
-        </h3>
+        </h2>
         <p>
             用户名:<input id="username" name="username" type="text" placeholder='输入新账号' required="required"/>
         </p>
@@ -51,11 +54,12 @@
             <button id=reg type="submit">立即注册</button>
             {% csrf_token %}
         </p>
-
-        </form>
-        <p>
+            <p>
             已有账号？<a href="/">请登录</a>
         </p>
+
+        </form>
+
     </div>
         
         

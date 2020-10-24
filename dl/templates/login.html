@@ -177,29 +177,29 @@
 			<p class="p1">登录界面</p>
 		</div>
 		<!-- 输入框 -->
-		<form method="post"	action="/login_action/">
+		<form method="post"	action="/dl/login_action/">
 			{% csrf_token %}
 			<div class="lgD">
-				<img src="img/logName.png" width="20" height="20" alt=""/>
+<!--				<img src="img/logName.png" width="20" height="20" alt=""/>-->
 				<label  class="usename-label">用户</label>
 				<input name="username" type="text" placeholder="账号" required="required"><br>
 			</div>
 			<div class="lgD">
-				<img src="img/logPwd.png" width="20" height="20" alt=""/>
+<!--				<img src="img/logPwd.png" width="20" height="20" alt=""/>-->
 				<label class="password-label">密码</label>
 				<input name="password" type="text" placeholder="密码" required="required"><br>
 			</div>
 
 			<div class="logC">
-				<a href="" target="_self"><button>登 录</button>
+				<a target="_self"><button>登 录</button>
 
 				</a>
 			</div>
 
 		</form>
 		&nbsp;
-		<div class="logC">
-			<a href="/register_page/" target="_self"><button>注 册</button>
+		<div class="logC" style="position: relative; top:-66px; right: -164px;">
+			<a href="/dl/register_page/"><button>注 册</button>
 			</a>
 
 		</div>
