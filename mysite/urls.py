@@ -22,10 +22,4 @@ urlpatterns = [
     url(r'^$', login),
     path(r'dl/', include('dl.urls')),
     path(r'admin/', admin.site.urls),
-    url('login_action/', login_action),
-    url(r'register/', register),
-    url(r'vote/', vote_page),
-    url(r'register_page/', register_page),
-    url('login/', login),
-    url('vote_action/', vote_action),
 ]

@@ -1,25 +1,32 @@
 from django.urls import path
-from . import views
+from django.conf.urls import url
+from . import views, models
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime
 
-
-def tick():
-    print('Tick! The time is: %s' % datetime.now())
-
-
-def tick1():
-    print('第二个')
-
-
 scheduler = BackgroundScheduler()
-scheduler.add_job(tick, 'interval', seconds=30)
-scheduler.add_job(tick1, 'interval', seconds=10)
-# scheduler.start()
+
+
+@scheduler.scheduled_job('cron', day_of_week='6', hour='23', minute='59', second='59')
+def clear_vote_num():
+    models.Vote.objects.all().update(num=0)
+    print('定时清空投票数,------------{}'.format(datetime.now()))
+
+
+@scheduler.scheduled_job('cron', day='1', hour='0', minute='0', second='1')
+def clear_force_vote_num():
+    models.Vote.objects.all().update(force_num=0)
+    print('定时清空强制投票数,------------{}'.format(datetime.now()))
+
+
+scheduler.start()
 
 urlpatterns = [
-    path('', views.login, name='login'),
-    path('', views.login_action, name='login_action'),
-    path('', views.register, name='register'),
-    path('', views.register_page, name='register_page'),
+    url(r'^login_action/', views.login_action),
+    url(r'^register/', views.register),
+    url(r'^vote/', views.vote_page),
+    url(r'^login/', views.login),
+    url(r'^vote_action/', views.vote_action),
+    url(r'^logout/', views.logout),
+    url(r'^register_page/', views.register_page),
 ]
