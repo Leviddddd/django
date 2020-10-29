@@ -6,15 +6,13 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from apscheduler.schedulers.blocking import BlockingScheduler
 from dl import models
 # Create your views here.
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from datetime import datetime
 from django.utils.datetime_safe import datetime
-from dl.models import Vote
 
-scheduler = BlockingScheduler()
+
 data = {'status': 3, 'error': '参数错误'}
 success = {'status': 1, 'error': '成功'}
 failure = {'status': 2, 'error': '失败'}
@@ -32,7 +30,6 @@ def login_action(request):
         if user:
             auth.login(request, user)
             response = HttpResponseRedirect('/dl/vote/')
-            # request.session['user'] = username
             user_id = models.AuthUser.objects.filter(username=username).values('id')
             if len(user_id):
                 user_id = models.AuthUser.objects.filter(username=username).values('id')[0]['id']
@@ -58,10 +55,20 @@ def vote_page(request):
     user_id = request.session.get('user', '')
     vote_info = models.Vote.objects.all().values('id', 'vote_name', 'num', 'force_num')
     vote_msg = []
+    vote_name = models.Vote.objects.filter().values('status', 'vote_name')
+    vote_name_list = []
+    final_vote_name = ''
+    for i in vote_name:
+        if i['status'] == 1:
+            vote_name_list.append(i)
+        if len(vote_name_list) > 0:
+            final_vote_name = vote_name_list[0]['vote_name']
+        else:
+            final_vote_name = '未有投票结果'
     for e in vote_info:
         e['user_id'] = user_id
         vote_msg.append(e)
-    return render(request, 'index.html', {'vote_info': vote_msg})
+    return render(request, 'index.html', {'vote_info': vote_msg, 'vote_name': final_vote_name})
 
 
 def register_page(request):
@@ -77,7 +84,6 @@ def register(request):
         user_list = []
         for i in local_user:
             user_list.append(i['username'])
-        print(user_list)
         if username in user_list:
             return render(request, 'tset.html', {'error': '账号已存在，注册失败'})
         else:
@@ -85,7 +91,7 @@ def register(request):
             if user:
                 return HttpResponseRedirect('/dl/login')
             else:
-                return render(request, '/dl/register_page', {'error': 'false'})
+                return render(request, '/dl/register_page', {'error': '注册账号失败'})
     except Exception as e:
         raise e
 
@@ -104,55 +110,65 @@ def get_time_info(info, time_stramp=None):
 @csrf_exempt
 @login_required
 def vote_action(request):
-    userId = int(request.POST.get('user_id'))
-    voteId = int(request.POST.get('vote_id'))
-    voteType = int(request.POST.get('vote_type'))
     try:
+        userId = int(request.POST.get('user_id', ''))
+        voteId = int(request.POST.get('vote_id', ''))
+        voteType = int(request.POST.get('vote_type', ''))
         user_vote_record = models.UserVote.objects.filter(user_id=userId, vote_type=voteType).values()
-        if user_vote_record:
-            update_time = str(user_vote_record[0]['update_time']).split('+')[0]
-            timeArray = time.strptime(update_time, "%Y-%m-%d %H:%M:%S")
-            timeStamp = int(time.mktime(timeArray))
-            now_year = get_time_info('Y')
-            old_year = get_time_info('Y', timeStamp)
-            old_week = get_time_info('W', timeStamp)
-            now_week = get_time_info('W')
-            old_month = get_time_info('m', timeStamp)
-            month = int(time.localtime().tm_mon)
-            # 周投票
-            if voteType == 1:
-                if now_week > old_week and now_year == old_year or now_year > old_year:
-                    models.UserVote.objects.filter(id=user_vote_record[0]['id']).update(vote_id=voteId,
-                                                                                        update_time=datetime.now())
+        force_vote = models.Vote.objects.all().values('vote_name', 'force_num')
+        force_vote_name_list = []
+        for name in force_vote:
+            if name['force_num'] >= 1:
+                force_vote_name_list.append(name['vote_name'])
+        if len(force_vote_name_list):
+            is_force_vote = {'status': 1, 'error': '本周{}已强制开会，无法投票'.format(force_vote_name_list[0])}
+            return JsonResponse(is_force_vote)
+        else:
+            if user_vote_record:
+                update_time = str(user_vote_record[0]['update_time']).split('+')[0]
+                timeArray = time.strptime(update_time, "%Y-%m-%d %H:%M:%S")
+                timeStamp = int(time.mktime(timeArray))
+                now_year = get_time_info('Y')
+                old_year = get_time_info('Y', timeStamp)
+                old_week = get_time_info('W', timeStamp)
+                now_week = get_time_info('W')
+                old_month = get_time_info('m', timeStamp)
+                month = int(time.localtime().tm_mon)
+                # 周投票
+                if voteType == 1:
+                    if now_week > old_week and now_year == old_year or now_year > old_year:
+                        models.UserVote.objects.filter(id=user_vote_record[0]['id']).update(vote_id=voteId,
+                                                                                            update_time=datetime.now())
+                        vote_num = models.Vote.objects.filter(id=voteId).values('num')[0]['num']
+                        models.Vote.objects.filter(id=voteId).update(num=vote_num + 1)
+                        return JsonResponse(success)
+                    else:
+                        failure['error'] = '当前不可投票'
+                        return JsonResponse(failure)
+                # 强制投票
+                elif voteType == 2:
+                    if month > old_month and now_year == old_year or now_year > old_year:
+                        force_num = models.Vote.objects.filter(id=voteId).values('force_num')[0]['force_num']
+                        models.Vote.objects.filter(id=voteId).update(force_num=force_num + 1)
+                        models.UserVote.objects.filter(id=user_vote_record[0]['id']).update(vote_id=voteId,
+                                                                                            update_time=datetime.now())
+                        return JsonResponse(success)
+                    else:
+                        return JsonResponse(failure)
+                else:
+                    return JsonResponse(failure)
+
+            else:
+                obj = models.UserVote(user_id=userId, vote_id=voteId, vote_type=voteType)
+                obj.save()
+                if voteType == 1:
                     vote_num = models.Vote.objects.filter(id=voteId).values('num')[0]['num']
                     models.Vote.objects.filter(id=voteId).update(num=vote_num + 1)
                     return JsonResponse(success)
-                else:
-                    failure['error'] = '当前不可投票'
-                    return JsonResponse(failure)
-            # 强制投票
-            elif voteType == 2:
-                if month > old_month and now_year == old_year or now_year > old_year:
+                elif voteType == 2:
                     force_num = models.Vote.objects.filter(id=voteId).values('force_num')[0]['force_num']
                     models.Vote.objects.filter(id=voteId).update(force_num=force_num + 1)
-                    models.UserVote.objects.filter(id=user_vote_record[0]['id']).update(vote_id=voteId,
-                                                                                        update_time=datetime.now())
                     return JsonResponse(success)
-                else:
-                    return JsonResponse(failure)
-            else:
-                return JsonResponse(data)
-        else:
-            obj = models.UserVote(user_id=userId, vote_id=voteId, vote_type=voteType)
-            obj.save()
-            if voteType == 1:
-                vote_num = models.Vote.objects.filter(id=voteId).values('num')[0]['num']
-                models.Vote.objects.filter(id=voteId).update(num=vote_num + 1)
-                return JsonResponse(success)
-            elif voteType == 2:
-                force_num = models.Vote.objects.filter(id=voteId).values('force_num')[0]['force_num']
-                models.Vote.objects.filter(id=voteId).update(force_num=force_num + 1)
-                return JsonResponse(success)
 
     except Exception as e:
         raise e

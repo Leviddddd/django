@@ -36,23 +36,12 @@ class AuthUser(models.Model):
         return self.id
 
 
-class Vote(models.Model):
-    vote_name = models.CharField(max_length=255, blank=True, null=True)
-    num = models.IntegerField()
-    force_num = models.IntegerField()
-    create_time = models.DateTimeField(default=datetime.now)
-    update_time = models.DateTimeField(default=datetime.now)
-
-    class Meta:
-        managed = False
-        db_table = 'vote'
-
-
 class UserVote(models.Model):
     id = models.AutoField(primary_key=True)
     user_id = models.IntegerField()
     vote_id = models.IntegerField()
     vote_type = models.IntegerField()
+    status = models.IntegerField(null=True)
     create_time = models.DateTimeField(blank=True, null=True, default=datetime.now)
     update_time = models.DateTimeField(blank=True, null=True, default=datetime.now)
 
@@ -60,3 +49,17 @@ class UserVote(models.Model):
         managed = False
         db_table = 'user_vote'
         unique_together = ('user_id', 'vote_type')
+
+
+class Vote(models.Model):
+    vote_name = models.CharField(max_length=255, blank=True, null=True)
+    num = models.IntegerField()
+    force_num = models.IntegerField()
+    status = models.IntegerField(blank=True, null=True)
+    create_time = models.DateTimeField(blank=True, null=True, default=datetime.now)
+    update_time = models.DateTimeField(blank=True, null=True, default=datetime.now)
+
+    class Meta:
+        managed = False
+        db_table = 'vote'
+
