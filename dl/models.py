@@ -41,13 +41,14 @@ class UserVote(models.Model):
     user_id = models.IntegerField()
     vote_id = models.IntegerField()
     vote_type = models.IntegerField()
-    status = models.IntegerField(null=True)
-    create_time = models.DateTimeField(blank=True, null=True, default=datetime.now)
-    update_time = models.DateTimeField(blank=True, null=True, default=datetime.now)
+    create_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateTimeField(auto_now=True)
 
     class Meta:
+        ordering = ['-update_time']
         managed = False
         db_table = 'user_vote'
+        verbose_name = u'用户投票记录'
         unique_together = ('user_id', 'vote_type')
 
 
@@ -56,10 +57,17 @@ class Vote(models.Model):
     num = models.IntegerField()
     force_num = models.IntegerField()
     status = models.IntegerField(blank=True, null=True)
-    create_time = models.DateTimeField(blank=True, null=True, default=datetime.now)
-    update_time = models.DateTimeField(blank=True, null=True, default=datetime.now)
+    create_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateTimeField(auto_now=True)
 
     class Meta:
+        ordering = ['pk']
+        verbose_name = '投票记录'
         managed = False
         db_table = 'vote'
 
+
+STATUS_CHOICES = [
+    (0, '未开会'),
+    (1, '开会')
+]
