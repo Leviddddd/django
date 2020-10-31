@@ -7,7 +7,7 @@
 
   <div id="two" class="">
     <a href="#">{{ user }}</a>
-    <a href="{% url 'dl:logout' %}">退出</a>
+    <a href="{% url 'dl:logout' %}">  退出</a>
 	</div>
 
 
@@ -36,7 +36,7 @@
       const DOM = document.getElementById('container')
       let result = ''
       vote_info.forEach((item)=>{
-        result+='<div style="width:'+(item.num*30+320)+'px"><span>'+item.num+'</span><a onclick="force('+item.id+','+item.user_id+',1)">投票</a><span>'+item.force_num+'</span><a onclick="force('+item.id+','+item.user_id+',2)">强制开会</a>'+item.vote_name+'</div>'
+        result+='<div style="width:'+(item.num*100+350)+'px"><span>'+item.num+'</span><a onclick="force('+item.id+','+item.user_id+',1)">投票</a><span>'+item.force_num+'</span><a onclick="force('+item.id+','+item.user_id+',2)">强制开会</a>'+item.vote_name+'</div>'
       })
       DOM.innerHTML = result
     }
@@ -44,6 +44,7 @@
         query()
         $('#container div a').click(function(){
             $(this).parent().animate({
+            width:'+=100px'
             },500);
 <!--            document.getElementById('container').style = 'pointer-events: none';-->
 
@@ -52,12 +53,11 @@
 </script>
 <style type="text/css">
     *{
-        padding:0;
-        margin:0;
+
         font-family:Arial
     }
     body{
-        background:#ffffff url('trentanove.gif') repeat right top;
+        background:#ffffff url('{% static 'img/photo.png' %}') repeat right top;
     }
     #container{
         margin-top:20px;
@@ -72,12 +72,12 @@
     }
     #container div{
 
-        background:#dcdada;
-        margin-bottom:15px;
-        padding:10px;
+        background:silver;
+        margin-bottom:35px;
+        padding:17px;
         color:#1d1a1a;
-        border-left:0px solid #333;
-        width:320px;
+        border-left:40px solid gainsboro;
+        width:350px;
         -webkit-border-radius:0.5em;
         -moz-border-radius:0 0.5em 0.5em 0;
         border-radius:0 1.5em 1.5em 0
@@ -103,8 +103,10 @@
 </style>
 </head>
 <body>
+{% load static %}
+
 <h4 align="center">注意：你本月只有一次《强制开会》</h4>
-  <div>本周开会时间:<a style="color: crimson;">{{ vote_name }}</a></div>
+  <span>本周开会时间： <a style="color: crimson;">{{ vote_name }}</a></span>
   <div id="container">
 
   </div>

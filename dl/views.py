@@ -41,8 +41,8 @@ def login_action(request):
 
 
 @login_required
-def logout(requst):
-    auth.logout(requst)
+def logout(request):
+    auth.logout(request)
     response = HttpResponseRedirect('/dl/')
     return response
 
@@ -68,22 +68,23 @@ def register_page(request):
 
 
 def register(request):
-    HttpResponseRedirect('/dl/register_page')
+    HttpResponseRedirect('/dl/register_page/')
     try:
         username = request.POST.get('username', '')
         password = request.POST.get('password', '')
-        local_user = models.AuthUser.objects.filter().values('username')
-        user_list = []
+        local_user = models.AuthUser.objects.all().values('username')
+        print(local_user)
+        local_user_list = []
         for i in local_user:
-            user_list.append(i['username'])
-        if username in user_list:
+            local_user_list.append(i['username'])
+        if username in local_user_list:
             return render(request, 'tset.html', {'error': '账号已存在，注册失败'})
         else:
             user = User.objects.create_user(username=username, password=password)
             if user:
                 return HttpResponseRedirect('/dl/')
             else:
-                return render(request, '/dl/register_page', {'error': '注册账号失败'})
+                return render(request, '/dl/register_page/', {'error': '注册账号失败'})
     except Exception as e:
         raise e
 
@@ -167,6 +168,5 @@ def vote_action(request):
                     vote_info.force_num += 1
                     vote_info.save()
                     return JsonResponse(success)
-
     except Exception as e:
-        raise e
+        return HttpResponse(e)

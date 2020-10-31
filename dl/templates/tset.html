@@ -1,16 +1,15 @@
-
-
 <!DOCTYPE html>
 <html>
     <head>
         <meta charset="UTF-8">
 
         <title></title>
+        {%load static%}
         <style type="text/css">
             form
             {
                 width:100%;
-                height:300px;
+                height:100%;
                  margin-top: 0px;
             }
             div
@@ -30,7 +29,7 @@
 
 body {
   display: flex;
-  height: 100vh;
+  height: 80vh;
   justify-content: center;
   align-items: center;
   text-align: center;
@@ -220,23 +219,24 @@ body {
 }
         </style>
     </head>
-    <body>
-    <div>
+    <body  style="background-image: url({% static '/img/222.jpg' %});
+        background-size:30% 60%;background-repeat:no-repeat;">
+    <div style="background-color: white; width:20%">
         <form method="post" action="{%url 'dl:register'%}">
             {% csrf_token %}
         <h2>
             注册
         </h2>
         <p>
-            用户名:<input id="username" name="username" type="text" placeholder='输入新账号' required="required"/>
+            用户名: <input style="height:35px;" id="username" name="username" type="text" placeholder='输入新账号' required="required"/>
         </p>
             <div class="alert alert-warning">{{ error }}</div>
         <p>
-            密&emsp;码:<input id="password" name="password" type="password" placeholder='设置密码' required="required"/>
+            密&emsp;码: <input style="height:35px;" id="password" name="password" type="password" placeholder='设置密码' required="required"/>
 
         </p>
         <p>
-            <button data-text="start" type="submit" class="btn btn-primary btn-ghost btn-border-stroke  btn-text-float-up">
+            <button data-text="start" style="left:26px;" type="submit" class="btn btn-primary btn-ghost btn-border-stroke  btn-text-float-up">
                 <div class="btn-borders">
                 <div class="border-top"></div>
                 <div class="border-right"></div>
