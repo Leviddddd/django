@@ -222,7 +222,8 @@ body {
     </head>
     <body>
     <div>
-        <form method="post" action="/dl/register/">
+        <form method="post" action="{%url 'dl:register'%}">
+            {% csrf_token %}
         <h2>
             注册
         </h2>
@@ -244,10 +245,9 @@ body {
                 </div>
                 <span class="btn-text" style="margin-left: -11px;">立即注册</span>
             </button>
-            {% csrf_token %}
         </p>
             <p>
-            已有账号？<a href="/">请登录</a>
+            已有账号？<a href="{%url 'dl:index'%}">请登录</a>
         </p>
         </form>
     </div>

@@ -1,12 +1,13 @@
 import time
 
 from django.urls import path
-from django.conf.urls import url
 from . import views, models
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime
 
 scheduler = BackgroundScheduler()
+
+app_name = 'dl'
 
 
 @scheduler.scheduled_job('cron', day_of_week='0', hour='0', minute='05', second='01')
@@ -45,11 +46,11 @@ def get_final_vote_name():
 scheduler.start()
 
 urlpatterns = [
-    url(r'^login_action/', views.login_action),
-    url(r'^register/', views.register),
-    url(r'^vote/', views.vote_page),
-    url(r'^login/', views.login),
-    url(r'^vote_action/', views.vote_action),
-    url(r'^logout/', views.logout),
-    url(r'^register_page/', views.register_page),
+    path('', views.index, name='index'),
+    path('login_action/', views.login_action, name='login_action'),
+    path('register/', views.register, name='register'),
+    path('vote/', views.vote_page, name='vote_page'),
+    path('vote_action/', views.vote_action, name='vote_action'),
+    path('logout/', views.logout, name='logout'),
+    path('register_page/', views.register_page, name='register_page'),
 ]

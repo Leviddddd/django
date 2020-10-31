@@ -7,7 +7,7 @@
 
   <div id="two" class="">
     <a href="#">{{ user }}</a>
-    <a href="/dl/logout/">退出</a>
+    <a href="{% url 'dl:logout' %}">退出</a>
 	</div>
 
 
@@ -18,8 +18,9 @@
             data:{csrfmiddlewaretoken:'{{ csrf_token }}'}
         })
     var vote_info ={{vote_info | safe}}
+    console.info(vote_info)
     function force(voteId, userId, voteType){
-      $.post('/dl/vote_action/',
+      $.post('{% url 'dl:vote_action' %}',
         {user_id: userId,
         vote_id: voteId,
         vote_type: voteType

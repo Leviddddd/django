@@ -20,7 +20,7 @@ class Vote(admin.ModelAdmin):
     actions = ['clear_vote_detail']
 
     def clear_vote_detail(self, request, queryset):
-        updated = queryset.update(num=0, force_num=0)
+        updated = queryset.update(num=0, force_num=0, status=0)
         self.message_user(request, ngettext(
             '%d story was update successfully.',
             '%d stories were update successfully.',

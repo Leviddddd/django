@@ -1,4 +1,3 @@
-
 import time
 
 from django.contrib import auth
@@ -12,13 +11,12 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from datetime import datetime
 from django.utils.datetime_safe import datetime
 
-
 data = {'status': 3, 'error': '参数错误'}
 success = {'status': 1, 'error': '成功'}
 failure = {'status': 2, 'error': '失败'}
 
 
-def login(request):
+def index(request):
     return render(request, 'login.html')
 
 
@@ -29,12 +27,11 @@ def login_action(request):
         user = auth.authenticate(username=username, password=password)
         if user:
             auth.login(request, user)
-            response = HttpResponseRedirect('/dl/vote/')
             user_id = models.AuthUser.objects.filter(username=username).values('id')
             if len(user_id):
                 user_id = models.AuthUser.objects.filter(username=username).values('id')[0]['id']
                 request.session['user'] = user_id
-                return response
+                return HttpResponseRedirect('/dl/vote/')
             else:
                 return render(request, 'login.html', {'error': '用户id为空，请重新登录'})
         else:
@@ -46,7 +43,7 @@ def login_action(request):
 @login_required
 def logout(requst):
     auth.logout(requst)
-    response = HttpResponseRedirect('/dl/login/')
+    response = HttpResponseRedirect('/dl/')
     return response
 
 
@@ -55,14 +52,11 @@ def vote_page(request):
     user_id = request.session.get('user', '')
     vote_info = models.Vote.objects.all().values('id', 'vote_name', 'num', 'force_num')
     vote_msg = []
-    vote_name = models.Vote.objects.filter().values('status', 'vote_name')
-    final_vote_name = ''
-    for i in vote_name:
-        if i['status'] == 1:
-            final_vote_name = i['vote_name']
-            break
-        else:
-            final_vote_name = '未有投票结果'
+    vote_name = models.Vote.objects.filter(status=1).values('status', 'vote_name')
+    if len(vote_name):
+        final_vote_name = vote_name[0]['vote_name']
+    else:
+        final_vote_name = '未有投票结果'
     for e in vote_info:
         e['user_id'] = user_id
         vote_msg.append(e)
@@ -87,7 +81,7 @@ def register(request):
         else:
             user = User.objects.create_user(username=username, password=password)
             if user:
-                return HttpResponseRedirect('/dl/login')
+                return HttpResponseRedirect('/dl/')
             else:
                 return render(request, '/dl/register_page', {'error': '注册账号失败'})
     except Exception as e:
@@ -105,7 +99,7 @@ def get_time_info(info, time_stramp=None):
     return int(time_info)
 
 
-@csrf_exempt
+# @csrf_exempt
 @login_required
 def vote_action(request):
     try:
