@@ -10,6 +10,7 @@ from dl.models import *
 @admin.register(UserVote)
 class UserVote(admin.ModelAdmin):
     date_hierarchy = 'create_time'
+    list_display = ('user_id', 'vote_id', 'vote_type', 'create_time', 'update_time')
 
 
 @admin.register(Vote)
@@ -28,3 +29,8 @@ class Vote(admin.ModelAdmin):
         ) % updated, messages.SUCCESS)
 
     clear_vote_detail.short_description = '清空投票记录'
+
+
+@admin.register(Meeting)
+class Meeting(admin.ModelAdmin):
+    list_display = ('meet_name', 'vote_list', 'meeting_date', 'update_time')

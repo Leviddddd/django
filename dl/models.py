@@ -38,12 +38,11 @@ class AuthUser(models.Model):
 
 class UserVote(models.Model):
     id = models.AutoField(primary_key=True)
-    user_id = models.IntegerField()
-    vote_id = models.IntegerField()
-    vote_type = models.IntegerField()
-    create_time = models.DateTimeField(auto_now_add=True)
-    update_time = models.DateTimeField(auto_now=True)
-
+    user_id = models.IntegerField(verbose_name='用户Id')
+    vote_id = models.IntegerField(verbose_name='投票id')
+    vote_type = models.IntegerField(verbose_name='投票类型')
+    create_time = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
+    update_time = models.DateTimeField(auto_now=True, verbose_name='更新时间')
     class Meta:
         ordering = ['-update_time']
         managed = False
@@ -53,18 +52,35 @@ class UserVote(models.Model):
 
 
 class Vote(models.Model):
-    vote_name = models.CharField(max_length=255, blank=True, null=True)
-    num = models.IntegerField()
-    force_num = models.IntegerField()
-    status = models.IntegerField(blank=True, null=True)
-    create_time = models.DateTimeField(auto_now_add=True)
-    update_time = models.DateTimeField(auto_now=True)
+    vote_name = models.CharField(max_length=255, blank=True, null=True, verbose_name='开会时间')
+    num = models.IntegerField(verbose_name='投票数')
+    force_num = models.IntegerField(verbose_name='强制投票数')
+    status = models.IntegerField(blank=True, null=True, verbose_name='是否开会')
+    create_time = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
+    update_time = models.DateTimeField(auto_now=True, verbose_name='更新时间')
 
     class Meta:
         ordering = ['pk']
         verbose_name = '投票记录'
         managed = False
         db_table = 'vote'
+
+
+class Meeting(models.Model):
+    meet_name = models.CharField(max_length=200, null=True, verbose_name='开会时间')
+    vote_list = models.CharField(max_length=255, null=True, verbose_name='投票记录列表')
+    meeting_date = models.CharField(max_length=50, null=True, verbose_name='开会周期')
+    create_time = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
+    update_time = models.DateTimeField(auto_now=True, verbose_name='更新时间')
+
+    class Meta:
+        ordering = ['pk']
+        verbose_name = '开会记录'
+        managed = False
+        db_table = 'meeting'
+
+    def __str__(self):
+        return self.meet_name
 
 
 STATUS_CHOICES = [

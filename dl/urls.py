@@ -10,13 +10,13 @@ scheduler = BackgroundScheduler()
 app_name = 'dl'
 
 
-@scheduler.scheduled_job('cron', day_of_week='0', hour='0', minute='05', second='01')
+@scheduler.scheduled_job('cron', day_of_week='0', hour='0', minute='01', second='01')
 def clear_vote_num():
     models.Vote.objects.all().update(num=0, force_num=0)
     print('定时清空投票数,------------{}'.format(datetime.now()))
 
 
-@scheduler.scheduled_job('cron', day_of_week='0', hour='0', minute='01', second='01')
+@scheduler.scheduled_job('cron', day_of_week='6', hour='23', minute='50', second='01')
 def get_final_vote_name():
     models.Vote.objects.all().update(status=0)
     print('初始化投票状态---------------------{}'.format(datetime.now()))
@@ -41,6 +41,17 @@ def get_final_vote_name():
         models.Vote.objects.filter(vote_name=l[0]).update(status=1)
 
     print('定时统计投票数,获取投票结果------------{}'.format(datetime.now()))
+
+
+@scheduler.scheduled_job('cron', day_of_week='6', hour='23', minute='55', second='01')
+def add_meeting_detail():
+    vote_info = models.Vote.objects.all().values('vote_name', 'num', 'force_num')
+    vote_data = []
+    for i in vote_info:
+        vote_data.append(str(list(i.values())))
+    meet_name = models.Vote.objects.get(status=1).vote_name
+    meet_date = models.Vote.objects.get(pk=meet_name.id).update_time.strftime('%W')
+    models.Meeting.objects.create(meet_name=meet_name, meeting_date=meet_date, vote_list=vote_data)
 
 
 scheduler.start()

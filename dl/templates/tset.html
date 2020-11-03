@@ -1,254 +1,69 @@
 <!DOCTYPE html>
-<html>
+{% load static %}
+<html lang="en">
     <head>
         <meta charset="UTF-8">
 
         <title></title>
-        {%load static%}
+
         <style type="text/css">
             form
             {
                 width:100%;
                 height:100%;
-                 margin-top: 0px;
+                 margin-top: 0;
             }
             div
             {
                 display:inline-block;
                 padding-top: 7px;
-                padding-left: 0px;
+                padding-left: 0;
             }
             h2
             {
-                font-family: "微软雅黑";
             font-size: 40px;
                 color:black;
             }
-
-@import url(https://fonts.googleapis.com/css?family=Lato);
-
 body {
   display: flex;
   height: 80vh;
   justify-content: center;
   align-items: center;
   text-align: center;
+  background-image: url("{% static '/img/222.jpg' %}");
+  background-size:30% 60%;
+  background-repeat:no-repeat;
 }
 
-.btn {
-  --hue: 190;
-  --ease-in-duration: 0.25s;
-  --ease-in-exponential: cubic-bezier(0.95, 0.05, 0.795, 0.035);
-  --ease-out-duration: 0.65s;
-  --ease-out-delay: var(--ease-in-duration);
-  --ease-out-exponential: cubic-bezier(0.19, 1, 0.22, 1);
-  position: relative;
-  padding: 1rem 3rem;
-  font-size: 1rem;
-  line-height: 0.5;
-  color: white;
-  text-decoration: none;
-  background-color: hsl(var(--hue), 100%, 41%);
-  border: 1px solid hsl(var(--hue), 100%, 41%);
-  outline: transparent;
-  overflow: hidden;
-  cursor: pointer;
-  user-select: none;
-  white-space: nowrap;
-  transition: 0.25s;
+.form-register {
+  width: 100%;
+  max-width: 330px;
+  padding: 15px;
+  margin: 0 auto;
 
-  &:hover {
-    background: hsl(var(--hue), 100%, 31%);
-  }
-
-  &-primary {
-    --hue: 171;
-  }
-
-  &-ghost {
-    color: hsl(var(--hue), 100%, 41%);
-    background-color: transparent;
-    border-color: hsl(var(--hue), 100%, 41%);
-
-    &:hover {
-      color: white;
-    }
-  }
-
-  &-border-stroke {
-    border-color: hsla(var(--hue), 100%, 41%, 0.35);
-
-    .btn-borders {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-
-      .border-top {
-        position: absolute;
-        top: 0;
-        width: 100%;
-        height: 1px;
-        background: hsl(var(--hue), 100%, 41%);
-        transform: scaleX(0);
-        transform-origin: left;
-      }
-
-      .border-right {
-        position: absolute;
-        right: 0;
-        width: 1px;
-        height: 100%;
-        background: hsl(var(--hue), 100%, 41%);
-        transform: scaleY(0);
-        transform-origin: bottom;
-      }
-
-      .border-bottom {
-        position: absolute;
-        bottom: 0;
-        width: 100%;
-        height: 1px;
-        background: hsl(var(--hue), 100%, 41%);
-        transform: scaleX(0);
-        transform-origin: left;
-      }
-
-      .border-left {
-        position: absolute;
-        left: 0;
-        width: 1px;
-        height: 100%;
-        background: hsl(var(--hue), 100%, 41%);
-        transform: scaleY(0);
-        transform-origin: bottom;
-      }
-
-      // when unhover, ease-out left, bottom; ease-in right, top
-
-      .border-left {
-        transition: var(--ease-out-duration) var(--ease-out-delay)
-          var(--ease-out-exponential);
-      }
-      .border-bottom {
-        transition: var(--ease-out-duration) var(--ease-out-delay)
-          var(--ease-out-exponential);
-      }
-
-      .border-right {
-        transition: var(--ease-in-duration) var(--ease-in-exponential);
-      }
-      .border-top {
-        transition: var(--ease-in-duration) var(--ease-in-exponential);
-      }
-    }
-
-    &:hover {
-      color: hsl(var(--hue), 100%, 41%);
-      background: transparent;
-
-      .border-top,
-      .border-bottom {
-        transform: scaleX(1);
-      }
-      .border-left,
-      .border-right {
-        transform: scaleY(1);
-      }
-
-      // when hover, ease-in left, bottom; ease-out right, top
-
-      .border-left {
-        transition: var(--ease-in-duration) var(--ease-in-exponential);
-      }
-      .border-bottom {
-        transition: var(--ease-in-duration) var(--ease-in-exponential);
-      }
-
-      .border-right {
-        transition: var(--ease-out-duration) var(--ease-out-delay)
-          var(--ease-out-exponential);
-      }
-      .border-top {
-        transition: var(--ease-out-duration) var(--ease-out-delay)
-          var(--ease-out-exponential);
-      }
-    }
-  }
-
-  &-text-float-up {
-    &::after {
-      position: absolute;
-      content: attr(data-text);
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      opacity: 0;
-      transform: translateY(35%);
-      transition: 0.25s ease-out;
-    }
-
-    // when hover, ease-in top-text; ease-out bottom-text
-
-    .btn-text {
-      display: block;
-      transition: 0.75s 0.1s var(--ease-out-exponential);
-    }
-
-    &:hover {
-      // when hover, ease-in bottom-text; ease-out top-text
-
-      .btn-text {
-        opacity: 0;
-        transform: translateY(-25%);
-        transition: 0.25s ease-out;
-      }
-
-      &::after {
-        opacity: 1;
-        transform: translateY(0);
-        transition: 0.75s 0.1s var(--ease-out-exponential);
-      }
-    }
-  }
+}
+.form-btn{
+    border-color: #6adcfa;
+    background-color: #FFFFFF;
+    color: blue;
 }
         </style>
     </head>
-    <body  style="background-image: url({% static '/img/222.jpg' %});
-        background-size:30% 60%;background-repeat:no-repeat;">
-    <div style="background-color: white; width:20%">
-        <form method="post" action="{%url 'dl:register'%}">
+    <body>
+    <div>
+        <form class='form-register' method="post" action="{%url 'dl:register'%}">
             {% csrf_token %}
-        <h2>
-            注册
-        </h2>
+        <h2>注册</h2>
         <p>
-            用户名: <input style="height:35px;" id="username" name="username" type="text" placeholder='输入新账号' required="required"/>
+            用户名: <label for="username"></label><input style="height:35px;" id="username" name="username" type="text" placeholder='输入新账号' required="required"/>
         </p>
-            <div class="alert alert-warning">{{ error }}</div>
+            {{ error }}<br>
         <p>
-            密&emsp;码: <input style="height:35px;" id="password" name="password" type="password" placeholder='设置密码' required="required"/>
+            密&emsp;码: <label for="password"></label><input style="height:35px;" id="password" name="password" type="password" placeholder='设置密码' required="required"/>
 
         </p>
-        <p>
-            <button data-text="start" style="left:26px;" type="submit" class="btn btn-primary btn-ghost btn-border-stroke  btn-text-float-up">
-                <div class="btn-borders">
-                <div class="border-top"></div>
-                <div class="border-right"></div>
-                <div class="border-bottom"></div>
-                <div class="border-left"></div>
-                </div>
-                <span class="btn-text" style="margin-left: -11px;">立即注册</span>
-            </button>
-        </p>
-            <p>
-            已有账号？<a href="{%url 'dl:index'%}">请登录</a>
-        </p>
+            <button class="form-btn">立即注册</button>
+            <p>已有账号？<a href="{%url 'dl:index'%}">请登录</a></p>
         </form>
     </div>
     </body>

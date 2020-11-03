@@ -19,7 +19,6 @@ failure = {'status': 2, 'error': '失败'}
 def index(request):
     return render(request, 'login.html')
 
-
 def login_action(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -27,13 +26,9 @@ def login_action(request):
         user = auth.authenticate(username=username, password=password)
         if user:
             auth.login(request, user)
-            user_id = models.AuthUser.objects.filter(username=username).values('id')
-            if len(user_id):
-                user_id = models.AuthUser.objects.filter(username=username).values('id')[0]['id']
-                request.session['user'] = user_id
-                return HttpResponseRedirect('/dl/vote/')
-            else:
-                return render(request, 'login.html', {'error': '用户id为空，请重新登录'})
+            user_obj = models.AuthUser.objects.get(username=username)
+            request.session['user'] = user_obj.id
+            return HttpResponseRedirect('/dl/vote/')
         else:
             return render(request, 'login.html', {'error': '请输入正确的账号或密码!'})
     else:

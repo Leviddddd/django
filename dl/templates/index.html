@@ -5,23 +5,21 @@
 <h1 align="center">开会时间投票</h1>
 
 
-  <div id="two" class="">
+  <div class="" id="two">
     <a href="#">{{ user }}</a>
     <a href="{% url 'dl:logout' %}">  退出</a>
 	</div>
 
-
 {% load static %}
-<script type='text/javascript' src="{% static 'js/jquery.min.js' %}"></script>
+<script type='text/javascript' src="{% static  'js/jquery.js' %}"></script>
 <script type="text/javascript">
-  $.ajaxSetup({
+    $.ajaxSetup({
             data:{csrfmiddlewaretoken:'{{ csrf_token }}'}
-        })
-    var vote_info ={{vote_info | safe}}
-    console.info(vote_info)
+        });
     function force(voteId, userId, voteType){
-      $.post('{% url 'dl:vote_action' %}',
-        {user_id: userId,
+      $.post("{% url 'dl:vote_action' %}",
+        {csrfmiddlewaretoken:'{{ csrf_token }}',
+            user_id: userId,
         vote_id: voteId,
         vote_type: voteType
         },function(data){
@@ -32,86 +30,41 @@
         function reloadPage(){
         location.reload()
         }
-    function query(){
-      const DOM = document.getElementById('container')
-      let result = ''
-      vote_info.forEach((item)=>{
-        result+='<div style="width:'+(item.num*100+350)+'px"><span>'+item.num+'</span><a onclick="force('+item.id+','+item.user_id+',1)">投票</a><span>'+item.force_num+'</span><a onclick="force('+item.id+','+item.user_id+',2)">强制开会</a>'+item.vote_name+'</div>'
-      })
-      DOM.innerHTML = result
-    }
+
     $(document).ready(function(){
-        query()
         $('#container div a').click(function(){
             $(this).parent().animate({
-            width:'+=100px'
+            // width:'+=100px'
             },500);
-<!--            document.getElementById('container').style = 'pointer-events: none';-->
-
         })
-    })
+    });
 </script>
-<style type="text/css">
-    *{
-
-        font-family:Arial
-    }
-    body{
-        background:#ffffff url('{% static 'img/photo.png' %}') repeat right top;
-    }
-    #container{
-        margin-top:20px;
-        color:#1d1a1a;
-    }
-    #container #question{
-        display:block;
-        padding:20px;
-        margin-bottom:20px;
-        padding:10px;
-   
-    }
-    #container div{
-
-        background:silver;
-        margin-bottom:35px;
-        padding:17px;
-        color:#1d1a1a;
-        border-left:40px solid gainsboro;
-        width:350px;
-        -webkit-border-radius:0.5em;
-        -moz-border-radius:0 0.5em 0.5em 0;
-        border-radius:0 1.5em 1.5em 0
-    }
-    #container div a{
-        border-radius:0.3em;
-        text-decoration:none;
-        color:#1d1a1a;
-        padding:5px 15px;
-        background:#f38d8d;
-        margin:0 20px;
-        align:center;
-    }
-    #container div a:hover{
-        color:#1d1a1a;
-    }
-     .submitOrder .sureSubmit{
-    		height: 39px;
-    		text-align: right;
-    	}
-    #two{width:100px;
-  position:absolute;  top:10px; right:0;}
-</style>
+<link href='{% static "/css/vote.css" %}' rel="stylesheet" type="text/css"/>
 </head>
 <body>
 {% load static %}
-
-<h4 align="center">注意：你本月只有一次《强制开会》</h4>
   <span>本周开会时间： <a style="color: crimson;">{{ vote_name }}</a></span>
-  <div id="container">
+<div id="container">
+  <form method="POST" action="">
+    {% csrf_token %}
+    {%for vote in vote_info%}
+<!--    django乘法-->
+      <div style="width:{%  widthratio 70 1 vote.num|add:5 %}px" >
+        <span>{{vote.num}}</span>
+        <a onclick="force(vote_id='{{vote.id}}', user_id='{{vote.user_id}}',vote_type='1')">
+          <button type="submit">投票</button>
+        </a>
+        <span>{{vote.force_num}}</span>
+        <a onclick="force(vote_id='{{vote.id}}', user_id='{{vote.user_id}}',vote_type='2')">
+          <button type="submit">强制投票</button>
+        </a>
+        {{vote.vote_name}}
+      </div>
+    {%endfor%}
 
-  </div>
-
-  <div>{{ error }}<br>
-    </div>
+  </form>
+ {{ error }}<br>
+</div>
+<h4>注意：你本月只有一次《强制开会》</h4>
 </body>
 </html>
