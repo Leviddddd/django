@@ -1,0 +1,35 @@
+#container{
+        margin-top:20px;
+        color:#1d1a1a;
+    }
+#container #question{
+        display:block;
+      margin-bottom:20px;
+        padding:10px;
+
+    }
+#container div{
+        background:silver;
+        margin-bottom:35px;
+        padding:17px;
+        color:#1d1a1a;
+        border-left:40px solid gainsboro;
+        width:350px;
+        -webkit-border-radius:0.5em;
+        -moz-border-radius:0 0.5em 0.5em 0;
+        border-radius:0 1.5em 1.5em 0
+    }
+#container div button{
+        border-radius:0.3em;
+        text-decoration:none;
+        color:#1d1a1a;
+        padding:5px 15px;
+        background:#f38d8d;
+        margin:0 20px;
+
+    }
+#container div button:hover{
+        color:#1d1a1a;
+    }
+#two{width:100px;
+  position:absolute;  top:10px; right:0;}
