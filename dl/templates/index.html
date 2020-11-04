@@ -45,10 +45,8 @@
 {% load static %}
   <span>本周开会时间： <a style="color: crimson;">{{ vote_name }}</a></span>
 <div id="container">
-  <form method="POST" action="">
-    {% csrf_token %}
     {%for vote in vote_info%}
-<!--    django乘法-->
+<!--    django乘法-a/b*(c+d)-->
       <div style="width:{%  widthratio 70 1 vote.num|add:5 %}px" >
         <span>{{vote.num}}</span>
         <a onclick="force(vote_id='{{vote.id}}', user_id='{{vote.user_id}}',vote_type='1')">
@@ -61,8 +59,6 @@
         {{vote.vote_name}}
       </div>
     {%endfor%}
-
-  </form>
  {{ error }}<br>
 </div>
 <h4>注意：你本月只有一次《强制开会》</h4>

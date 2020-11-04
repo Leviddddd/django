@@ -19,7 +19,6 @@ from dl .views import *
 from django.conf.urls import url
 
 urlpatterns = [
-    # url(r'^$', login),
     path(r'dl/', include('dl.urls')),
     path(r'admin/', admin.site.urls),
     path(r'polls/', include('polls.urls')),

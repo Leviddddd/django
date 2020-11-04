@@ -19,6 +19,7 @@ failure = {'status': 2, 'error': '失败'}
 def index(request):
     return render(request, 'login.html')
 
+
 def login_action(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -42,7 +43,7 @@ def logout(request):
     return response
 
 
-@login_required
+@login_required()
 def vote_page(request):
     user_id = request.session.get('user', '')
     vote_info = models.Vote.objects.all().values('id', 'vote_name', 'num', 'force_num')
@@ -95,7 +96,6 @@ def get_time_info(info, time_stramp=None):
     return int(time_info)
 
 
-# @csrf_exempt
 @login_required
 def vote_action(request):
     try:

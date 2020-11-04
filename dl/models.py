@@ -43,6 +43,7 @@ class UserVote(models.Model):
     vote_type = models.IntegerField(verbose_name='投票类型')
     create_time = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
     update_time = models.DateTimeField(auto_now=True, verbose_name='更新时间')
+
     class Meta:
         ordering = ['-update_time']
         managed = False
