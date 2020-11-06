@@ -66,6 +66,9 @@ class Vote(models.Model):
         managed = False
         db_table = 'vote'
 
+    def __str__(self):
+        return self.vote_name
+
 
 class Meeting(models.Model):
     meet_name = models.CharField(max_length=200, null=True, verbose_name='开会时间')

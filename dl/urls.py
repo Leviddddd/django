@@ -1,4 +1,6 @@
 import time
+
+from django.db.models import Max, Min, Avg
 from django.urls import path, re_path
 from . import views, models
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -16,41 +18,39 @@ def clear_vote_num():
 
 
 @scheduler.scheduled_job('cron', day_of_week='6', hour='23', minute='50', second='01')
+# @scheduler.scheduled_job('interval', seconds=5)
 def get_final_vote_name():
     models.Vote.objects.all().update(status=0)
     print('初始化投票状态---------------------{}'.format(datetime.now()))
-    vote_info = models.Vote.objects.all().values('vote_name', 'num', 'force_num', 'status')
-    vote_num_list = []
-    vote_force_list = []
-    time.sleep(5)
-    for e in vote_info:
-        vote_num_list.append(e['num'])
-        if e['force_num'] == 1:
-            vote_force_list.append(e['force_num'])
-            c = e['vote_name']
-            models.Vote.objects.filter(vote_name=c).update(status=1)
-            print('本周存在强制投票,{}开会---------------{}'.format(c, datetime.now()))
-            break
-    if len(vote_force_list) < 1:
-        num = max(vote_num_list)
-        a = models.Vote.objects.filter(num=num).values('vote_name')
-        l = []
-        for i in a:
-            l.append(i['vote_name'])
-        models.Vote.objects.filter(vote_name=l[0]).update(status=1)
+    vote_force_name = models.Vote.objects.filter(force_num=1).values('vote_name')[:1]
+    if vote_force_name:
+        vote_force_name = list(vote_force_name[0].keys())[0]
+        models.Vote.objects.filter(vote_name=vote_force_name).update(status=1)
+        print('本周存在强制投票,{}开会---------------{}'.format(vote_force_name, datetime.now()))
+    else:
+        num = list(models.Vote.objects.aggregate(Max('num')).values())[0]
+        print(num)
+        if num >= 1:
+            vote_num_name = list(models.Vote.objects.filter(num=num).values('vote_name')[:1][0].values())[0]
+            models.Vote.objects.filter(vote_name=vote_num_name).update(status=1)
+            print('定时统计投票数,获取投票结果------------{}'.format(datetime.now()))
 
-    print('定时统计投票数,获取投票结果------------{}'.format(datetime.now()))
-
-
+# @scheduler.scheduled_job('interval', seconds=5)
 @scheduler.scheduled_job('cron', day_of_week='6', hour='23', minute='55', second='01')
 def add_meeting_detail():
-    vote_info = models.Vote.objects.all().values('vote_name', 'num', 'force_num')
-    vote_data = []
-    for i in vote_info:
-        vote_data.append(str(list(i.values())))
-    meet_name = models.Vote.objects.get(status=1).vote_name
-    meet_date = models.Vote.objects.get(pk=meet_name.id).update_time.strftime('%W')
-    models.Meeting.objects.create(meet_name=meet_name, meeting_date=meet_date, vote_list=vote_data)
+    vote_info = models.Vote.objects.filter(status=1).values()[:1]
+    if vote_info:
+        vote_info = vote_info[0]
+        meet_name = vote_info['vote_name']
+        meet_date = vote_info['update_time'].strftime('%W')
+    else:
+        meet_name = '未有投票结果'
+        meet_date = datetime.now().strftime('%W')
+    vote_data = models.Vote.objects.all().values('vote_name', 'num', 'force_num')
+    vote_data_list = []
+    for i in vote_data:
+        vote_data_list.append(tuple(i.values()))
+    models.Meeting.objects.create(meet_name=meet_name, meeting_date=meet_date, vote_list=vote_data_list)
     print('插入开会结果数据---------------------------{}'.format(datetime.now()))
 
 
