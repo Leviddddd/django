@@ -64,3 +64,12 @@ class DetailView(generic.DetailView):
 class ResultsView(generic.DetailView):
     model = Question
     template_name = 'polls/results.html'
+
+
+def orc(request):
+    import easyocr
+    url = request.GET.get('url', '')
+    if url:
+        reader = easyocr.Reader(['ch_sim', 'en'])  # need to run only once to load model into memory
+        result = reader.readtext(url, detail=0)
+        return HttpResponse(result)

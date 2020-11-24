@@ -29,7 +29,7 @@ APPEND_SLASH = True
 ALLOWED_HOSTS = ['*']
 
 # Application definition
-LOGIN_URL = '/dl/account_login'
+# LOGIN_URL = '/dl/account_login'
 
 INSTALLED_APPS = [
     'django.contrib.admin',

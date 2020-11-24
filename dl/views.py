@@ -1,3 +1,4 @@
+import json
 import time
 
 from django.contrib import auth
@@ -43,7 +44,7 @@ def logout(request):
     return response
 
 
-@login_required()
+@login_required(login_url='/dl/')
 def vote_page(request):
     user_id = request.session.get('user', '')
     vote_info = models.Vote.objects.all().values('id', 'vote_name', 'num', 'force_num')
@@ -165,3 +166,6 @@ def vote_action(request):
                     return JsonResponse(success)
     except Exception as e:
         return HttpResponse(e)
+
+
+

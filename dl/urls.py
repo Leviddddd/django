@@ -29,7 +29,6 @@ def get_final_vote_name():
         print('本周存在强制投票,{}开会---------------{}'.format(vote_force_name, datetime.now()))
     else:
         num = list(models.Vote.objects.aggregate(Max('num')).values())[0]
-        print(num)
         if num >= 1:
             vote_num_name = list(models.Vote.objects.filter(num=num).values('vote_name')[:1][0].values())[0]
             models.Vote.objects.filter(vote_name=vote_num_name).update(status=1)
@@ -65,4 +64,5 @@ urlpatterns = [
     path('vote_action/', views.vote_action, name='vote_action'),
     path('logout/', views.logout, name='logout'),
     path('register_page/', views.register_page, name='register_page'),
+
 ]
