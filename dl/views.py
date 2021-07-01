@@ -97,7 +97,7 @@ def get_time_info(info, time_stramp=None):
     return int(time_info)
 
 
-@login_required
+@login_required(login_url='/dl/')
 def vote_action(request):
     try:
         userId = int(request.POST.get('user_id', ''))
